@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO Meta Tags -->
+  <title>Fixed vs Variable Rate Loan Comparison Calculator | Side-by-Side</title>
+  <meta name="description" content="Compare fixed and variable rate loans side-by-side. See monthly payments, total interest, and the exact difference instantly. No opinions, just numbers.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Fixed vs Variable Rate Loan Comparison Calculator">
+  <meta property="og:description" content="Compare two loans side-by-side. See the difference instantly. No opinions, just numbers.">
+  <meta property="og:type" content="website">
+
+  <!-- Canonical URL - UPDATE WITH ACTUAL DOMAIN BEFORE LAUNCH -->
+  <link rel="canonical" href="https://example.com/loan/fixed-vs-variable">
+
+  <!-- FAQ Schema (JSON-LD) for Rich Snippets -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Why does the fixed rate loan look more expensive at first?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Fixed rates are typically set higher than initial variable rates because lenders price in the cost of rate stability. You're paying for predictability. Variable rates start lower but carry the risk of increasing over time."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When could a variable rate end up costing more?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "If interest rates rise significantly during your loan term, a variable rate loan could become more expensive than a fixed rate option. This calculator shows a snapshot at current rates—actual costs depend on future rate movements."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why might my bank's numbers be different from this calculator?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Banks may include fees, insurance, or use different calculation methods (daily vs monthly compounding). This calculator uses standard amortization formulas for comparison purposes. Always confirm final numbers with your lender."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I trust these calculation results?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This calculator uses standard financial formulas that match most loan calculators. However, it's a simplified model for comparison purposes. For actual loan decisions, verify numbers with your bank or financial institution."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is amortization?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Amortization means your monthly payment stays the same, but the portion going to interest vs principal changes over time. Early payments are mostly interest; later payments are mostly principal."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Should I choose fixed or variable rate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "This calculator doesn't make recommendations. Your choice depends on your risk tolerance, financial situation, and expectations about future interest rates. We show you the numbers—you decide what's right for you."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Calculator/Software Application Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Fixed vs Variable Rate Loan Comparison Calculator",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Compare fixed and variable rate loans side-by-side. See monthly payments, total interest, and the exact difference.",
+    "featureList": [
+      "Side-by-side loan comparison",
+      "Instant calculations",
+      "No registration required",
+      "100% client-side processing"
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+
+    <!-- Hero Section -->
+    <header class="hero">
+      <h1>Fixed vs Variable Rate Loan Comparison Calculator</h1>
+      <p class="subtitle">Compare two loans side-by-side. No opinions. Just numbers.</p>
+    </header>
+
+    <!-- KEY DIFFERENCE SUMMARY - The Hero (Above the Fold) -->
+    <section class="summary-hero" aria-label="Key difference summary" aria-live="polite">
+      <div class="summary-card">
+        <p class="summary-label">Total Interest Difference</p>
+        <p class="summary-amount" id="hero-diff">$48,686</p>
+        <p class="summary-context" id="hero-context">Loan A pays more over <span id="hero-term">30</span> years</p>
+      </div>
+    </section>
+
+    <!-- Calculator Section -->
+    <section class="calculator" aria-label="Loan comparison inputs">
+
+      <div class="input-grid">
+        <!-- Loan A -->
+        <div class="loan-card loan-a">
+          <h2>Loan A</h2>
+          <div class="input-group">
+            <label for="amount-a">Loan Amount</label>
+            <div class="input-wrapper">
+              <span class="prefix">$</span>
+              <input type="number" id="amount-a" value="300000" min="1000" step="1000" inputmode="numeric">
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="term-a">Term (years)</label>
+            <input type="number" id="term-a" value="30" min="1" max="50" inputmode="numeric">
+          </div>
+          <div class="input-group">
+            <label for="rate-a">Interest Rate</label>
+            <div class="input-wrapper">
+              <input type="number" id="rate-a" value="6.5" min="0" max="30" step="0.1" inputmode="decimal">
+              <span class="suffix">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loan B -->
+        <div class="loan-card loan-b">
+          <h2>Loan B</h2>
+          <div class="input-group">
+            <label for="amount-b">Loan Amount</label>
+            <div class="input-wrapper">
+              <span class="prefix">$</span>
+              <input type="number" id="amount-b" value="300000" min="1000" step="1000" inputmode="numeric">
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="term-b">Term (years)</label>
+            <input type="number" id="term-b" value="30" min="1" max="50" inputmode="numeric">
+          </div>
+          <div class="input-group">
+            <label for="rate-b">Interest Rate</label>
+            <div class="input-wrapper">
+              <input type="number" id="rate-b" value="5.8" min="0" max="30" step="0.1" inputmode="decimal">
+              <span class="suffix">%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Detailed Results Section -->
+    <section class="results" aria-label="Detailed comparison results" aria-live="polite">
+      <h2 class="results-title">Detailed Breakdown</h2>
+
+      <!-- Monthly Payment Comparison -->
+      <div class="result-row">
+        <h3>Monthly Payment</h3>
+        <div class="comparison">
+          <div class="value value-a">
+            <span class="label">A</span>
+            <span class="amount" id="monthly-a">--</span>
+          </div>
+          <div class="value value-b">
+            <span class="label">B</span>
+            <span class="amount" id="monthly-b">--</span>
+          </div>
+        </div>
+        <div class="difference" id="monthly-diff">
+          <span class="diff-amount">--</span>
+          <span class="diff-label">per month</span>
+        </div>
+      </div>
+
+      <!-- Total Interest Comparison -->
+      <div class="result-row">
+        <h3>Total Interest Paid</h3>
+        <div class="comparison">
+          <div class="value value-a">
+            <span class="label">A</span>
+            <span class="amount" id="interest-a">--</span>
+          </div>
+          <div class="value value-b">
+            <span class="label">B</span>
+            <span class="amount" id="interest-b">--</span>
+          </div>
+        </div>
+        <div class="difference" id="interest-diff">
+          <span class="diff-amount">--</span>
+          <span class="diff-label">total</span>
+        </div>
+      </div>
+
+      <!-- Total Cost Comparison -->
+      <div class="result-row">
+        <h3>Total Amount Paid</h3>
+        <div class="comparison">
+          <div class="value value-a">
+            <span class="label">A</span>
+            <span class="amount" id="total-a">--</span>
+          </div>
+          <div class="value value-b">
+            <span class="label">B</span>
+            <span class="amount" id="total-b">--</span>
+          </div>
+        </div>
+        <div class="difference" id="total-diff">
+          <span class="diff-amount">--</span>
+          <span class="diff-label">total</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- AdSense Slot -->
+    <aside class="ad-slot" aria-label="Advertisement">
+      <!-- Google AdSense code goes here -->
+      <div class="ad-placeholder">
+        <span>Advertisement</span>
+      </div>
+    </aside>
+
+    <!-- Context Section - Why Numbers Differ -->
+    <section class="context">
+      <h2>Why do these numbers differ?</h2>
+      <ul>
+        <li><strong>Interest rate</strong> directly affects monthly payments and total cost</li>
+        <li><strong>Loan term</strong> spreads payments over time but increases total interest</li>
+        <li>This loan comparison calculator assumes <strong>constant rates</strong> for the full term</li>
+        <li>Variable rates may change, affecting actual costs over time</li>
+      </ul>
+    </section>
+
+    <!-- FAQ Section - Trust-First -->
+    <section class="faq" itemscope itemtype="https://schema.org/FAQPage">
+      <h2>Common Questions</h2>
+
+      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">Why does the fixed rate loan look more expensive at first?</summary>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">Fixed rates are typically set higher than initial variable rates because lenders price in the cost of rate stability. You're paying for predictability. Variable rates start lower but carry the risk of increasing over time.</p>
+        </div>
+      </details>
+
+      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">When could a variable rate end up costing more?</summary>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">If interest rates rise significantly during your loan term, a variable rate loan could become more expensive than a fixed rate option. This calculator shows a snapshot at current rates—actual costs depend on future rate movements.</p>
+        </div>
+      </details>
+
+      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">Why might my bank's numbers be different from this calculator?</summary>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">Banks may include fees, insurance, or use different calculation methods (daily vs monthly compounding). This calculator uses standard amortization formulas for comparison purposes. Always confirm final numbers with your lender.</p>
+        </div>
+      </details>
+
+      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">Can I trust these calculation results?</summary>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">This calculator uses standard financial formulas that match most loan calculators. However, it's a simplified model for comparison purposes. For actual loan decisions, verify numbers with your bank or financial institution.</p>
+        </div>
+      </details>
+
+      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">What is amortization?</summary>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">Amortization means your monthly payment stays the same, but the portion going to interest vs principal changes over time. Early payments are mostly interest; later payments are mostly principal.</p>
+        </div>
+      </details>
+
+      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">Should I choose fixed or variable rate?</summary>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">This calculator doesn't make recommendations. Your choice depends on your risk tolerance, financial situation, and expectations about future interest rates. We show you the numbers—you decide what's right for you.</p>
+        </div>
+      </details>
+
+    </section>
+
+    <!-- Disclaimer -->
+    <footer class="disclaimer">
+      <p><strong>Disclaimer:</strong> This calculator is for reference and educational purposes only. Results are estimates based on the inputs provided and may differ from actual bank calculations. This is not financial advice. No personal data is collected or stored—all calculations happen in your browser.</p>
+      <p class="copyright">© 2025 Loan Comparison Calculator. All calculations are performed client-side.</p>
+    </footer>
+
+  </main>
+
+  <script src="calculator.js"></script>
+</body>
+</html>

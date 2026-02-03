@@ -1,0 +1,10 @@
+{
+  "name": "loan-comparison-calculator",
+  "version": "1.0.0",
+  "description": "Fixed vs Variable Rate Loan Comparison Calculator",
+  "private": true,
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "start": "npx serve ."
+  }
+}

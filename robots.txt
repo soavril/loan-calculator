@@ -1,0 +1,8 @@
+# Loan Comparison Calculator - robots.txt
+# Allow all crawlers to index the site
+
+User-agent: *
+Allow: /
+
+# Sitemap (update with actual domain)
+Sitemap: https://yourdomain.com/sitemap.xml
