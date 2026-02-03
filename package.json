@@ -4,7 +4,11 @@
   "description": "Fixed vs Variable Rate Loan Comparison Calculator",
   "private": true,
   "scripts": {
-    "dev": "python3 -m http.server 8080",
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build required'",
     "start": "npx serve ."
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
