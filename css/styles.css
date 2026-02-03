@@ -722,6 +722,21 @@ input[type="number"] {
   color: #888;
 }
 
+.contact-info {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.contact-info a {
+  color: #1565c0;
+  text-decoration: none;
+}
+
+.contact-info a:hover {
+  text-decoration: underline;
+}
+
 .copyright {
   margin-top: 0.75rem;
   font-size: 0.6875rem;
