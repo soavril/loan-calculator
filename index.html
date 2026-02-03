@@ -1,22 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- SEO Meta Tags -->
-  <title>Fixed vs Variable Rate Loan Comparison Calculator | Side-by-Side</title>
-  <meta name="description" content="Compare fixed and variable rate loans side-by-side. See monthly payments, total interest, and the exact difference instantly. No opinions, just numbers.">
+  <title>대출 비교 계산기 - 두 대출 조건을 한눈에 비교 | 원리금균등, 원금균등, 거치식</title>
+  <meta name="description" content="대출 A와 B의 월 상환액, 총 이자, 총 상환액을 즉시 비교합니다. 원리금균등, 원금균등, 만기일시상환, 거치식 대출 모두 지원. 숫자만 제공, 의견 없음.">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Fixed vs Variable Rate Loan Comparison Calculator">
-  <meta property="og:description" content="Compare two loans side-by-side. See the difference instantly. No opinions, just numbers.">
+  <meta property="og:title" content="대출 비교 계산기 - 두 대출 조건 비교">
+  <meta property="og:description" content="대출 A와 B를 한눈에 비교. 원리금균등, 원금균등, 만기일시, 거치식 모두 지원.">
   <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
 
-  <!-- Canonical URL - UPDATE WITH ACTUAL DOMAIN BEFORE LAUNCH -->
-  <link rel="canonical" href="https://example.com/loan/fixed-vs-variable">
+  <!-- Naver 서치어드바이저 (실제 등록 후 교체) -->
+  <meta name="naver-site-verification" content="NAVER_VERIFICATION_CODE">
 
-  <!-- FAQ Schema (JSON-LD) for Rich Snippets -->
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://example.com/대출-비교-계산기">
+
+  <!-- FAQ Schema -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -24,290 +28,418 @@
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "Why does the fixed rate loan look more expensive at first?",
+        "name": "원리금균등상환과 원금균등상환의 차이는?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Fixed rates are typically set higher than initial variable rates because lenders price in the cost of rate stability. You're paying for predictability. Variable rates start lower but carry the risk of increasing over time."
+          "text": "원리금균등상환은 매월 동일한 금액(원금+이자)을 납부합니다. 원금균등상환은 매월 동일한 원금을 납부하고 이자는 잔액에 따라 감소합니다. 원리금균등은 초기 부담이 적고, 원금균등은 총 이자가 적습니다."
         }
       },
       {
         "@type": "Question",
-        "name": "When could a variable rate end up costing more?",
+        "name": "거치기간이란 무엇인가요?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "If interest rates rise significantly during your loan term, a variable rate loan could become more expensive than a fixed rate option. This calculator shows a snapshot at current rates—actual costs depend on future rate movements."
+          "text": "거치기간은 원금 상환 없이 이자만 납부하는 기간입니다. 거치기간이 끝나면 남은 기간 동안 원금과 이자를 함께 상환합니다. 거치기간이 길수록 총 이자 부담이 증가합니다."
         }
       },
       {
         "@type": "Question",
-        "name": "Why might my bank's numbers be different from this calculator?",
+        "name": "은행 계산기와 결과가 다를 수 있나요?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Banks may include fees, insurance, or use different calculation methods (daily vs monthly compounding). This calculator uses standard amortization formulas for comparison purposes. Always confirm final numbers with your lender."
+          "text": "네, 은행마다 반올림 시점, 일수 계산 방식, 수수료 포함 여부가 다를 수 있습니다. 본 계산기는 표준 공식을 사용하며, 실제 대출 조건은 해당 금융기관에 확인하시기 바랍니다."
         }
       },
       {
         "@type": "Question",
-        "name": "Can I trust these calculation results?",
+        "name": "만기일시상환은 언제 유리한가요?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "This calculator uses standard financial formulas that match most loan calculators. However, it's a simplified model for comparison purposes. For actual loan decisions, verify numbers with your bank or financial institution."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What is amortization?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Amortization means your monthly payment stays the same, but the portion going to interest vs principal changes over time. Early payments are mostly interest; later payments are mostly principal."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Should I choose fixed or variable rate?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "This calculator doesn't make recommendations. Your choice depends on your risk tolerance, financial situation, and expectations about future interest rates. We show you the numbers—you decide what's right for you."
+          "text": "만기일시상환은 대출 기간 동안 이자만 납부하고 만기에 원금을 일시 상환합니다. 단기 자금 운용이나 만기 전 목돈 마련 계획이 있는 경우 고려할 수 있으나, 총 이자 부담이 가장 큽니다."
         }
       }
     ]
   }
   </script>
 
-  <!-- Calculator/Software Application Schema -->
+  <!-- Calculator Schema -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "Fixed vs Variable Rate Loan Comparison Calculator",
+    "name": "대출 비교 계산기",
     "applicationCategory": "FinanceApplication",
     "operatingSystem": "Web Browser",
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "USD"
+      "priceCurrency": "KRW"
     },
-    "description": "Compare fixed and variable rate loans side-by-side. See monthly payments, total interest, and the exact difference.",
-    "featureList": [
-      "Side-by-side loan comparison",
-      "Instant calculations",
-      "No registration required",
-      "100% client-side processing"
-    ]
+    "description": "두 대출 조건을 비교하는 무료 계산기. 원리금균등, 원금균등, 만기일시, 거치식 지원.",
+    "inLanguage": "ko"
   }
   </script>
 
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <main class="container">
 
-    <!-- Hero Section -->
+    <!-- 헤더 -->
     <header class="hero">
-      <h1>Fixed vs Variable Rate Loan Comparison Calculator</h1>
-      <p class="subtitle">Compare two loans side-by-side. No opinions. Just numbers.</p>
+      <h1>대출 비교 계산기</h1>
+      <p class="subtitle">두 대출 조건을 한눈에 비교하세요. 숫자만 제공합니다.</p>
     </header>
 
-    <!-- KEY DIFFERENCE SUMMARY - The Hero (Above the Fold) -->
-    <section class="summary-hero" aria-label="Key difference summary" aria-live="polite">
-      <div class="summary-card">
-        <p class="summary-label">Total Interest Difference</p>
-        <p class="summary-amount" id="hero-diff">$48,686</p>
-        <p class="summary-context" id="hero-context">Loan A pays more over <span id="hero-term">30</span> years</p>
+    <!-- 핵심 차이 요약 (Hero) -->
+    <section class="summary-hero" aria-label="비교 요약" aria-live="polite">
+      <div class="summary-card" id="summary-card">
+        <p class="summary-label">총 이자 차이</p>
+        <p class="summary-amount" id="hero-diff">0원</p>
+        <p class="summary-context" id="hero-context">대출 조건을 입력하세요</p>
       </div>
     </section>
 
-    <!-- Calculator Section -->
-    <section class="calculator" aria-label="Loan comparison inputs">
+    <!-- 대출 입력 섹션 -->
+    <section class="calculator" aria-label="대출 조건 입력">
+
+      <!-- 탭 전환 (모바일) -->
+      <div class="loan-tabs">
+        <button type="button" class="tab-btn active" data-tab="loan-a" aria-selected="true">
+          대출 A
+        </button>
+        <button type="button" class="tab-btn" data-tab="loan-b" aria-selected="false">
+          대출 B
+        </button>
+      </div>
 
       <div class="input-grid">
-        <!-- Loan A -->
-        <div class="loan-card loan-a">
-          <h2>Loan A</h2>
+
+        <!-- 대출 A -->
+        <div class="loan-card loan-a" id="loan-a-card">
+          <h2 class="loan-title">대출 A</h2>
+
           <div class="input-group">
-            <label for="amount-a">Loan Amount</label>
+            <label for="principal-a">대출금액</label>
             <div class="input-wrapper">
-              <span class="prefix">$</span>
-              <input type="number" id="amount-a" value="300000" min="1000" step="1000" inputmode="numeric">
+              <input type="text" id="principal-a" inputmode="numeric" value="300,000,000" data-raw="300000000">
+              <span class="suffix">원</span>
+            </div>
+            <p class="input-hint" id="principal-a-hint">3억원</p>
+          </div>
+
+          <div class="input-group">
+            <label for="term-a">대출기간</label>
+            <div class="input-row">
+              <div class="input-wrapper flex-1">
+                <input type="number" id="term-years-a" value="30" min="1" max="50" inputmode="numeric">
+                <span class="suffix">년</span>
+              </div>
+              <span class="input-or">또는</span>
+              <div class="input-wrapper flex-1">
+                <input type="number" id="term-months-a" value="360" min="1" max="600" inputmode="numeric">
+                <span class="suffix">개월</span>
+              </div>
             </div>
           </div>
+
           <div class="input-group">
-            <label for="term-a">Term (years)</label>
-            <input type="number" id="term-a" value="30" min="1" max="50" inputmode="numeric">
-          </div>
-          <div class="input-group">
-            <label for="rate-a">Interest Rate</label>
+            <label for="rate-a">연 이자율</label>
             <div class="input-wrapper">
-              <input type="number" id="rate-a" value="6.5" min="0" max="30" step="0.1" inputmode="decimal">
+              <input type="number" id="rate-a" value="4.5" min="0" max="30" step="0.1" inputmode="decimal">
               <span class="suffix">%</span>
             </div>
           </div>
-        </div>
 
-        <!-- Loan B -->
-        <div class="loan-card loan-b">
-          <h2>Loan B</h2>
           <div class="input-group">
-            <label for="amount-b">Loan Amount</label>
-            <div class="input-wrapper">
-              <span class="prefix">$</span>
-              <input type="number" id="amount-b" value="300000" min="1000" step="1000" inputmode="numeric">
+            <label>상환방식</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="repayment-a" value="equalPrincipalInterest" checked>
+                <span>원리금균등</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="repayment-a" value="equalPrincipal">
+                <span>원금균등</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="repayment-a" value="bullet">
+                <span>만기일시</span>
+              </label>
             </div>
           </div>
+
+          <!-- 고급 옵션: 거치기간 -->
+          <details class="advanced-options">
+            <summary>고급 옵션</summary>
+            <div class="advanced-content">
+              <div class="input-group">
+                <label for="grace-a">거치기간</label>
+                <div class="input-wrapper">
+                  <input type="number" id="grace-a" value="0" min="0" max="120" inputmode="numeric">
+                  <span class="suffix">개월</span>
+                </div>
+                <p class="input-hint">거치기간 동안 이자만 납부</p>
+              </div>
+              <div class="input-group" id="grace-repayment-a-group" style="display: none;">
+                <label>거치 후 상환방식</label>
+                <div class="radio-group">
+                  <label class="radio-label">
+                    <input type="radio" name="grace-repayment-a" value="EPI" checked>
+                    <span>원리금균등</span>
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="grace-repayment-a" value="EP">
+                    <span>원금균등</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- 대출 B -->
+        <div class="loan-card loan-b" id="loan-b-card">
+          <h2 class="loan-title">대출 B</h2>
+
           <div class="input-group">
-            <label for="term-b">Term (years)</label>
-            <input type="number" id="term-b" value="30" min="1" max="50" inputmode="numeric">
-          </div>
-          <div class="input-group">
-            <label for="rate-b">Interest Rate</label>
+            <label for="principal-b">대출금액</label>
             <div class="input-wrapper">
-              <input type="number" id="rate-b" value="5.8" min="0" max="30" step="0.1" inputmode="decimal">
+              <input type="text" id="principal-b" inputmode="numeric" value="300,000,000" data-raw="300000000">
+              <span class="suffix">원</span>
+            </div>
+            <p class="input-hint" id="principal-b-hint">3억원</p>
+          </div>
+
+          <div class="input-group">
+            <label for="term-b">대출기간</label>
+            <div class="input-row">
+              <div class="input-wrapper flex-1">
+                <input type="number" id="term-years-b" value="30" min="1" max="50" inputmode="numeric">
+                <span class="suffix">년</span>
+              </div>
+              <span class="input-or">또는</span>
+              <div class="input-wrapper flex-1">
+                <input type="number" id="term-months-b" value="360" min="1" max="600" inputmode="numeric">
+                <span class="suffix">개월</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="rate-b">연 이자율</label>
+            <div class="input-wrapper">
+              <input type="number" id="rate-b" value="4.0" min="0" max="30" step="0.1" inputmode="decimal">
               <span class="suffix">%</span>
             </div>
           </div>
-        </div>
-      </div>
 
+          <div class="input-group">
+            <label>상환방식</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="repayment-b" value="equalPrincipalInterest" checked>
+                <span>원리금균등</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="repayment-b" value="equalPrincipal">
+                <span>원금균등</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="repayment-b" value="bullet">
+                <span>만기일시</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 고급 옵션: 거치기간 -->
+          <details class="advanced-options">
+            <summary>고급 옵션</summary>
+            <div class="advanced-content">
+              <div class="input-group">
+                <label for="grace-b">거치기간</label>
+                <div class="input-wrapper">
+                  <input type="number" id="grace-b" value="0" min="0" max="120" inputmode="numeric">
+                  <span class="suffix">개월</span>
+                </div>
+                <p class="input-hint">거치기간 동안 이자만 납부</p>
+              </div>
+              <div class="input-group" id="grace-repayment-b-group" style="display: none;">
+                <label>거치 후 상환방식</label>
+                <div class="radio-group">
+                  <label class="radio-label">
+                    <input type="radio" name="grace-repayment-b" value="EPI" checked>
+                    <span>원리금균등</span>
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="grace-repayment-b" value="EP">
+                    <span>원금균등</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+      </div>
     </section>
 
-    <!-- Detailed Results Section -->
-    <section class="results" aria-label="Detailed comparison results" aria-live="polite">
-      <h2 class="results-title">Detailed Breakdown</h2>
+    <!-- 상세 결과 -->
+    <section class="results" aria-label="비교 결과" aria-live="polite">
+      <h2 class="results-title">상세 비교</h2>
 
-      <!-- Monthly Payment Comparison -->
-      <div class="result-row">
-        <h3>Monthly Payment</h3>
-        <div class="comparison">
-          <div class="value value-a">
-            <span class="label">A</span>
-            <span class="amount" id="monthly-a">--</span>
-          </div>
-          <div class="value value-b">
-            <span class="label">B</span>
-            <span class="amount" id="monthly-b">--</span>
-          </div>
-        </div>
-        <div class="difference" id="monthly-diff">
-          <span class="diff-amount">--</span>
-          <span class="diff-label">per month</span>
-        </div>
+      <div class="results-table-wrapper">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="col-a">대출 A</th>
+              <th class="col-b">대출 B</th>
+              <th class="col-diff">차이</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">상환방식</td>
+              <td id="result-type-a">원리금균등</td>
+              <td id="result-type-b">원리금균등</td>
+              <td class="diff-cell">-</td>
+            </tr>
+            <tr>
+              <td class="row-label">월 납부액<span class="sub-label">(초기)</span></td>
+              <td id="result-monthly-a">-</td>
+              <td id="result-monthly-b">-</td>
+              <td class="diff-cell" id="diff-monthly">-</td>
+            </tr>
+            <tr>
+              <td class="row-label">총 이자</td>
+              <td id="result-interest-a">-</td>
+              <td id="result-interest-b">-</td>
+              <td class="diff-cell" id="diff-interest">-</td>
+            </tr>
+            <tr>
+              <td class="row-label">총 상환액</td>
+              <td id="result-total-a">-</td>
+              <td id="result-total-b">-</td>
+              <td class="diff-cell" id="diff-total">-</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <!-- Total Interest Comparison -->
-      <div class="result-row">
-        <h3>Total Interest Paid</h3>
-        <div class="comparison">
-          <div class="value value-a">
-            <span class="label">A</span>
-            <span class="amount" id="interest-a">--</span>
-          </div>
-          <div class="value value-b">
-            <span class="label">B</span>
-            <span class="amount" id="interest-b">--</span>
-          </div>
-        </div>
-        <div class="difference" id="interest-diff">
-          <span class="diff-amount">--</span>
-          <span class="diff-label">total</span>
-        </div>
+      <!-- 상환 스케줄 버튼 -->
+      <div class="schedule-actions">
+        <button type="button" class="btn-secondary" id="btn-schedule-a">
+          대출 A 상환표 보기
+        </button>
+        <button type="button" class="btn-secondary" id="btn-schedule-b">
+          대출 B 상환표 보기
+        </button>
       </div>
-
-      <!-- Total Cost Comparison -->
-      <div class="result-row">
-        <h3>Total Amount Paid</h3>
-        <div class="comparison">
-          <div class="value value-a">
-            <span class="label">A</span>
-            <span class="amount" id="total-a">--</span>
-          </div>
-          <div class="value value-b">
-            <span class="label">B</span>
-            <span class="amount" id="total-b">--</span>
-          </div>
-        </div>
-        <div class="difference" id="total-diff">
-          <span class="diff-amount">--</span>
-          <span class="diff-label">total</span>
-        </div>
-      </div>
-
     </section>
 
-    <!-- AdSense Slot -->
-    <aside class="ad-slot" aria-label="Advertisement">
-      <!-- Google AdSense code goes here -->
-      <div class="ad-placeholder">
-        <span>Advertisement</span>
+    <!-- 상환 스케줄 모달/섹션 -->
+    <section class="schedule-section" id="schedule-section" style="display: none;">
+      <div class="schedule-header">
+        <h3 id="schedule-title">상환 스케줄</h3>
+        <div class="schedule-actions-inline">
+          <button type="button" class="btn-small" id="btn-download-csv">CSV 다운로드</button>
+          <button type="button" class="btn-small btn-close" id="btn-close-schedule">닫기</button>
+        </div>
       </div>
-    </aside>
+      <div class="schedule-table-wrapper">
+        <table class="schedule-table" id="schedule-table">
+          <thead>
+            <tr>
+              <th>회차</th>
+              <th>납부액</th>
+              <th>원금</th>
+              <th>이자</th>
+              <th>잔액</th>
+            </tr>
+          </thead>
+          <tbody id="schedule-tbody">
+            <!-- JS로 채움 -->
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-    <!-- Context Section - Why Numbers Differ -->
-    <section class="context">
-      <h2>Why do these numbers differ?</h2>
+    <!-- 왜 차이가 나는지 설명 -->
+    <section class="explanation">
+      <h2>왜 차이가 날까요?</h2>
       <ul>
-        <li><strong>Interest rate</strong> directly affects monthly payments and total cost</li>
-        <li><strong>Loan term</strong> spreads payments over time but increases total interest</li>
-        <li>This loan comparison calculator assumes <strong>constant rates</strong> for the full term</li>
-        <li>Variable rates may change, affecting actual costs over time</li>
+        <li><strong>이자율 차이</strong>: 0.5%p 차이도 30년이면 수천만 원 차이가 납니다.</li>
+        <li><strong>상환방식 차이</strong>: 원리금균등은 초기 부담 적음, 원금균등은 총 이자 적음.</li>
+        <li><strong>거치기간</strong>: 거치기간이 길수록 총 이자 부담이 증가합니다.</li>
+        <li><strong>대출기간</strong>: 기간이 길수록 월 납부액은 줄지만 총 이자는 증가합니다.</li>
       </ul>
     </section>
 
-    <!-- FAQ Section - Trust-First -->
+    <!-- AdSense 영역 -->
+    <aside class="ad-slot" aria-label="광고">
+      <div class="ad-placeholder">
+        <span>광고 영역</span>
+      </div>
+    </aside>
+
+    <!-- FAQ -->
     <section class="faq" itemscope itemtype="https://schema.org/FAQPage">
-      <h2>Common Questions</h2>
+      <h2>자주 묻는 질문</h2>
 
       <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">Why does the fixed rate loan look more expensive at first?</summary>
+        <summary itemprop="name">원리금균등상환과 원금균등상환의 차이는?</summary>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">Fixed rates are typically set higher than initial variable rates because lenders price in the cost of rate stability. You're paying for predictability. Variable rates start lower but carry the risk of increasing over time.</p>
+          <p itemprop="text"><strong>원리금균등상환</strong>은 매월 동일한 금액(원금+이자)을 납부합니다. 초기에는 이자 비중이 높고, 시간이 지날수록 원금 비중이 높아집니다.<br><br><strong>원금균등상환</strong>은 매월 동일한 원금을 납부하고, 이자는 남은 잔액에 따라 매월 감소합니다. 초기 납부액이 크지만 총 이자 부담은 적습니다.</p>
         </div>
       </details>
 
       <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">When could a variable rate end up costing more?</summary>
+        <summary itemprop="name">거치기간이란 무엇인가요?</summary>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">If interest rates rise significantly during your loan term, a variable rate loan could become more expensive than a fixed rate option. This calculator shows a snapshot at current rates—actual costs depend on future rate movements.</p>
+          <p itemprop="text">거치기간은 원금 상환 없이 이자만 납부하는 기간입니다. 예를 들어 30년 대출에 2년 거치기간을 설정하면, 처음 2년간은 이자만 납부하고 이후 28년간 원금과 이자를 함께 상환합니다.<br><br>거치기간은 초기 상환 부담을 줄여주지만, 원금이 줄지 않아 총 이자 부담이 증가합니다.</p>
         </div>
       </details>
 
       <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">Why might my bank's numbers be different from this calculator?</summary>
+        <summary itemprop="name">은행 계산기와 결과가 다를 수 있나요?</summary>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">Banks may include fees, insurance, or use different calculation methods (daily vs monthly compounding). This calculator uses standard amortization formulas for comparison purposes. Always confirm final numbers with your lender.</p>
+          <p itemprop="text">네, 다음과 같은 이유로 차이가 발생할 수 있습니다:<br><br>• <strong>반올림 방식</strong>: 은행마다 원 단위, 10원 단위 등 반올림 시점이 다름<br>• <strong>일수 계산</strong>: 30일/365일 또는 실제 일수 기준 차이<br>• <strong>수수료</strong>: 중도상환수수료, 인지대 등 미포함<br><br>본 계산기는 표준 공식을 사용하며, 실제 대출 조건은 해당 금융기관에서 확인하시기 바랍니다.</p>
         </div>
       </details>
 
       <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">Can I trust these calculation results?</summary>
+        <summary itemprop="name">어떤 상환방식이 유리한가요?</summary>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">This calculator uses standard financial formulas that match most loan calculators. However, it's a simplified model for comparison purposes. For actual loan decisions, verify numbers with your bank or financial institution.</p>
+          <p itemprop="text">본 계산기는 추천이나 조언을 제공하지 않습니다. 숫자만 보여드립니다.<br><br>각 방식의 특징을 참고하여 본인의 상황(소득, 자금 계획, 상환 능력 등)에 맞게 판단하시기 바랍니다. 필요시 금융기관 전문가와 상담하세요.</p>
         </div>
       </details>
 
       <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">What is amortization?</summary>
+        <summary itemprop="name">계산 결과를 신뢰해도 되나요?</summary>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">Amortization means your monthly payment stays the same, but the portion going to interest vs principal changes over time. Early payments are mostly interest; later payments are mostly principal.</p>
+          <p itemprop="text">본 계산기는 한국주택금융공사 및 시중은행에서 사용하는 표준 상환 공식을 적용합니다. 그러나 실제 대출 조건, 우대금리, 수수료 등에 따라 결과가 달라질 수 있습니다.<br><br>계산 결과는 참고용이며, 실제 대출 결정 전 반드시 해당 금융기관에서 정확한 조건을 확인하세요.</p>
         </div>
       </details>
-
-      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">Should I choose fixed or variable rate?</summary>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">This calculator doesn't make recommendations. Your choice depends on your risk tolerance, financial situation, and expectations about future interest rates. We show you the numbers—you decide what's right for you.</p>
-        </div>
-      </details>
-
     </section>
 
-    <!-- Disclaimer -->
+    <!-- 면책 조항 -->
     <footer class="disclaimer">
-      <p><strong>Disclaimer:</strong> This calculator is for reference and educational purposes only. Results are estimates based on the inputs provided and may differ from actual bank calculations. This is not financial advice. No personal data is collected or stored—all calculations happen in your browser.</p>
-      <p class="copyright">© 2025 Loan Comparison Calculator. All calculations are performed client-side.</p>
+      <h3>안내사항</h3>
+      <p>본 계산기는 <strong>참고용 정보 제공</strong> 목적으로 제작되었습니다.</p>
+      <ul>
+        <li>계산 결과는 실제 금융기관의 대출 조건, 심사 결과와 다를 수 있습니다.</li>
+        <li>본 서비스는 금융 상품 추천, 투자 조언, 대출 알선을 하지 않습니다.</li>
+        <li>실제 대출 진행 시 반드시 해당 금융기관에 문의하시기 바랍니다.</li>
+        <li>계산 결과에 대한 법적 책임을 지지 않습니다.</li>
+      </ul>
+      <p class="privacy-note">모든 계산은 사용자의 브라우저에서만 수행되며, 입력 정보는 서버로 전송되거나 저장되지 않습니다.</p>
+      <p class="copyright">© 2025 대출 비교 계산기. All calculations are performed client-side.</p>
     </footer>
 
   </main>
 
-  <script src="calculator.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/ui.js"></script>
 </body>
 </html>

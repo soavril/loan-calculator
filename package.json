@@ -1,7 +1,7 @@
 {
-  "name": "loan-comparison-calculator",
-  "version": "1.0.0",
-  "description": "Fixed vs Variable Rate Loan Comparison Calculator",
+  "name": "loan-comparison-calculator-kr",
+  "version": "2.0.0",
+  "description": "대출 비교 계산기 - 원리금균등, 원금균등, 만기일시, 거치식 지원",
   "private": true,
   "scripts": {
     "dev": "npx serve .",
@@ -10,5 +10,12 @@
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "keywords": [
+    "대출 계산기",
+    "loan calculator",
+    "원리금균등",
+    "원금균등",
+    "거치식"
+  ]
 }
