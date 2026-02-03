@@ -751,6 +751,163 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
+/* === 검증 배지 === */
+.validation-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  margin-bottom: 1rem;
+}
+
+.validation-badge.valid {
+  background: #e8f5e9;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+}
+
+.validation-badge.invalid {
+  background: #fff3e0;
+  border: 1px solid #ff9800;
+  color: #e65100;
+}
+
+.validation-badge .badge-icon {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.validation-badge .badge-text {
+  font-weight: 600;
+}
+
+.validation-badge .badge-detail {
+  font-size: 0.75rem;
+  color: #666;
+  margin-left: auto;
+}
+
+.validation-badge.valid .badge-detail {
+  color: #4caf50;
+}
+
+.validation-badge.invalid .badge-detail {
+  color: #e65100;
+}
+
+/* === 만기일시 경고 배너 === */
+.bullet-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #fff8e1;
+  border: 1px solid #ffca28;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.bullet-warning .warning-icon {
+  flex-shrink: 0;
+}
+
+.bullet-warning .warning-text {
+  color: #f57f17;
+}
+
+/* === 상환표 페이지네이션 === */
+.schedule-pagination {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-page {
+  padding: 0.5rem 0.875rem;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 36px;
+}
+
+.btn-page:hover {
+  background: #eee;
+}
+
+.btn-page.active {
+  background: #1565c0;
+  border-color: #1565c0;
+  color: #fff;
+}
+
+/* === 상환표 특수 행 === */
+.schedule-table .summary-row {
+  background: #f5f5f5 !important;
+  border-top: 2px solid #1565c0;
+}
+
+.schedule-table .summary-row td {
+  padding: 0.875rem 0.5rem;
+}
+
+.schedule-table .highlight-row {
+  background: #fff3e0 !important;
+}
+
+.schedule-table .highlight-row td {
+  font-weight: 600;
+}
+
+.schedule-table .more-row {
+  background: transparent !important;
+}
+
+.schedule-table .more-info {
+  text-align: center !important;
+  color: #888;
+  font-size: 0.75rem;
+  padding: 1rem !important;
+}
+
+/* === 배지 스타일 === */
+.badge-grace {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  background: #fff8e1;
+  border: 1px solid #ffca28;
+  border-radius: 4px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #f57f17;
+  margin-left: 0.25rem;
+  vertical-align: middle;
+}
+
+.schedule-warning {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #e65100;
+  margin-left: 0.5rem;
+}
+
+/* === 서브 값 (월 납부액 이자만 표기) === */
+.sub-value {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #888;
+  margin-top: 0.125rem;
+}
+
 /* === 유틸리티 === */
 .sr-only {
   position: absolute;

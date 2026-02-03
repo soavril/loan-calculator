@@ -1,5 +1,5 @@
 /**
- * 대출 비교 계산기 - 계산 로직 모듈
+ * 대출 비교 계산기 - 계산 로직 모듈 v2.1
  *
  * 지원 상환방식:
  * 1. 원리금균등상환 (Equal Principal and Interest)
@@ -7,7 +7,13 @@
  * 3. 만기일시상환 (Bullet Repayment)
  * 4. 거치식 (Grace Period + Amortization)
  *
+ * v2.1 변경사항:
+ * - Single Source of Truth: Summary를 Schedule에서 산출
+ * - validateSchedule(): 불변식 검증 함수 추가
+ * - summarizeSchedule(): 스케줄에서 요약 추출
+ *
  * 공식 출처: 한국주택금융공사, 시중은행 대출 계산 기준
+ * 이자 계산 방식: 월할 단리 (월 이자율 = 연이율 / 12)
  */
 
 const LoanCalculator = (function() {
@@ -17,6 +23,8 @@ const LoanCalculator = (function() {
   const CONFIG = {
     // 반올림: 원 단위
     roundToWon: true,
+    // 검증 허용 오차 (원)
+    toleranceWon: 10,
     // 검증 범위
     validation: {
       minPrincipal: 100000,        // 최소 10만원
@@ -84,6 +92,116 @@ const LoanCalculator = (function() {
     };
   }
 
+  // === 스케줄 요약 (Single Source of Truth) ===
+
+  /**
+   * 스케줄에서 요약 정보 추출
+   * @param {Array} schedule - 상환 스케줄 배열
+   * @param {number} originalPrincipal - 원래 대출 원금
+   * @returns {Object} 요약 정보
+   */
+  function summarizeSchedule(schedule, originalPrincipal) {
+    if (!schedule || schedule.length === 0) {
+      return {
+        firstPayment: 0,
+        lastPayment: 0,
+        maxPayment: 0,
+        avgPayment: 0,
+        totalInterest: 0,
+        totalPayment: 0,
+        totalPrincipalPaid: 0,
+        finalBalance: 0,
+      };
+    }
+
+    let totalInterest = 0;
+    let totalPrincipal = 0;
+    let totalPayment = 0;
+    let maxPayment = 0;
+
+    schedule.forEach(row => {
+      totalInterest += row.interest;
+      totalPrincipal += row.principal;
+      totalPayment += row.payment;
+      if (row.payment > maxPayment) maxPayment = row.payment;
+    });
+
+    return {
+      firstPayment: roundWon(schedule[0].payment),
+      lastPayment: roundWon(schedule[schedule.length - 1].payment),
+      maxPayment: roundWon(maxPayment),
+      avgPayment: roundWon(totalPayment / schedule.length),
+      totalInterest: roundWon(totalInterest),
+      totalPayment: roundWon(totalPayment),
+      // 검증용
+      totalPrincipalPaid: roundWon(totalPrincipal),
+      finalBalance: roundWon(schedule[schedule.length - 1].balance),
+    };
+  }
+
+  /**
+   * 스케줄 불변식 검증
+   * @param {Array} schedule - 상환 스케줄 배열
+   * @param {number} originalPrincipal - 원래 대출 원금
+   * @returns {Object} { isValid, errors, details }
+   */
+  function validateSchedule(schedule, originalPrincipal) {
+    const errors = [];
+    const tolerance = CONFIG.toleranceWon;
+
+    if (!schedule || schedule.length === 0) {
+      return { isValid: false, errors: ['스케줄이 비어있습니다.'], details: {} };
+    }
+
+    const summary = summarizeSchedule(schedule, originalPrincipal);
+
+    // 1. 원금 합계 검증: Σ(principal) == P
+    const principalDiff = Math.abs(summary.totalPrincipalPaid - originalPrincipal);
+    if (principalDiff > tolerance) {
+      errors.push(`원금 합계 불일치: ${summary.totalPrincipalPaid.toLocaleString()}원 ≠ ${originalPrincipal.toLocaleString()}원 (차이: ${principalDiff.toLocaleString()}원)`);
+    }
+
+    // 2. 최종 잔액 검증: balance_n == 0
+    if (summary.finalBalance !== 0) {
+      errors.push(`최종 잔액 ≠ 0: ${summary.finalBalance.toLocaleString()}원`);
+    }
+
+    // 3. 행별 검증: payment == principal + interest
+    let rowErrors = 0;
+    schedule.forEach((row, i) => {
+      const expectedPayment = row.principal + row.interest;
+      const diff = Math.abs(row.payment - expectedPayment);
+      if (diff > tolerance) {
+        rowErrors++;
+        if (rowErrors <= 3) { // 처음 3개만 표시
+          errors.push(`${row.month}회차: 납부액(${row.payment.toLocaleString()}) ≠ 원금(${row.principal.toLocaleString()}) + 이자(${row.interest.toLocaleString()})`);
+        }
+      }
+    });
+    if (rowErrors > 3) {
+      errors.push(`... 외 ${rowErrors - 3}건의 행 검증 오류`);
+    }
+
+    // 4. 총 상환액 검증: totalPayment == principal + totalInterest
+    const expectedTotal = originalPrincipal + summary.totalInterest;
+    const totalDiff = Math.abs(summary.totalPayment - expectedTotal);
+    if (totalDiff > tolerance * schedule.length) { // 행 수만큼 허용
+      errors.push(`총 상환액 불일치: ${summary.totalPayment.toLocaleString()}원 ≠ ${expectedTotal.toLocaleString()}원`);
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      details: {
+        principalSum: summary.totalPrincipalPaid,
+        interestSum: summary.totalInterest,
+        paymentSum: summary.totalPayment,
+        finalBalance: summary.finalBalance,
+        originalPrincipal,
+      }
+    };
+  }
+
   // === 원리금균등상환 ===
 
   /**
@@ -98,17 +216,46 @@ const LoanCalculator = (function() {
     if (!isFinite(compoundFactor)) return 0;
 
     const payment = (principal * monthlyRate * compoundFactor) / (compoundFactor - 1);
-    return roundWon(payment);
+    return payment; // 반올림은 스케줄 생성 시
+  }
+
+  function generateEPISchedule(principal, monthlyRate, months) {
+    const schedule = [];
+    let balance = principal;
+    const rawPayment = calcEqualPrincipalInterestPayment(principal, monthlyRate, months);
+
+    for (let i = 1; i <= months; i++) {
+      const interest = balance * monthlyRate;
+      let principalPaid = rawPayment - interest;
+
+      // 마지막 회차: 잔액 전액 상환 (반올림 오차 보정)
+      if (i === months) {
+        principalPaid = balance;
+      }
+
+      const payment = principalPaid + interest;
+      balance = Math.max(0, balance - principalPaid);
+
+      schedule.push({
+        month: i,
+        payment: roundWon(payment),
+        principal: roundWon(principalPaid),
+        interest: roundWon(interest),
+        balance: roundWon(balance),
+      });
+    }
+
+    return schedule;
   }
 
   /**
-   * 원리금균등상환 전체 계산
+   * 원리금균등상환 계산 (SSOT 패턴)
    */
   function calculateEqualPrincipalInterest(principal, annualRate, months) {
     const monthlyRate = getMonthlyRate(annualRate);
-    const monthlyPayment = calcEqualPrincipalInterestPayment(principal, monthlyRate, months);
-    const totalPayment = monthlyPayment * months;
-    const totalInterest = totalPayment - principal;
+    const schedule = generateEPISchedule(principal, monthlyRate, months);
+    const summary = summarizeSchedule(schedule, principal);
+    const validation = validateSchedule(schedule, principal);
 
     return {
       type: REPAYMENT_TYPES.EQUAL_PRINCIPAL_INTEREST,
@@ -116,46 +263,56 @@ const LoanCalculator = (function() {
       principal: roundWon(principal),
       annualRate,
       months,
-      monthlyPayment: roundWon(monthlyPayment),
-      firstPayment: roundWon(monthlyPayment),
-      lastPayment: roundWon(monthlyPayment),
-      avgPayment: roundWon(monthlyPayment),
-      maxPayment: roundWon(monthlyPayment),
-      totalInterest: roundWon(totalInterest),
-      totalPayment: roundWon(totalPayment),
+      graceMonths: 0,
+      // 월 납부액 정보 (스케줄에서 추출)
+      monthlyPayment: summary.firstPayment,
+      firstPayment: summary.firstPayment,
+      lastPayment: summary.lastPayment,
+      avgPayment: summary.avgPayment,
+      maxPayment: summary.maxPayment,
+      // 합계 (스케줄에서 추출)
+      totalInterest: summary.totalInterest,
+      totalPayment: summary.totalPayment,
+      // 검증 결과
+      validation,
     };
   }
 
   // === 원금균등상환 ===
 
-  /**
-   * 원금균등상환 k회차 납부액 계산
-   * 월 원금 = P / n
-   * k회차 이자 = (P - 월원금 × (k-1)) × r
-   */
-  function calcEqualPrincipalPaymentAt(principal, monthlyRate, months, k) {
+  function generateEPSchedule(principal, monthlyRate, months) {
+    const schedule = [];
+    let balance = principal;
     const monthlyPrincipal = principal / months;
-    const remainingPrincipal = principal - (monthlyPrincipal * (k - 1));
-    const interest = remainingPrincipal * monthlyRate;
-    return roundWon(monthlyPrincipal + interest);
+
+    for (let i = 1; i <= months; i++) {
+      const interest = balance * monthlyRate;
+      // 마지막 회차: 잔액 전액 상환
+      const principalPaid = (i === months) ? balance : monthlyPrincipal;
+      const payment = principalPaid + interest;
+
+      balance = Math.max(0, balance - principalPaid);
+
+      schedule.push({
+        month: i,
+        payment: roundWon(payment),
+        principal: roundWon(principalPaid),
+        interest: roundWon(interest),
+        balance: roundWon(balance),
+      });
+    }
+
+    return schedule;
   }
 
   /**
-   * 원금균등상환 전체 계산
+   * 원금균등상환 계산 (SSOT 패턴)
    */
   function calculateEqualPrincipal(principal, annualRate, months) {
     const monthlyRate = getMonthlyRate(annualRate);
-    const monthlyPrincipal = principal / months;
-
-    // 첫 회차 납부액 (최대)
-    const firstPayment = calcEqualPrincipalPaymentAt(principal, monthlyRate, months, 1);
-    // 마지막 회차 납부액 (최소)
-    const lastPayment = calcEqualPrincipalPaymentAt(principal, monthlyRate, months, months);
-
-    // 총 이자 계산: P × r × (n+1) / 2
-    const totalInterest = principal * monthlyRate * (months + 1) / 2;
-    const totalPayment = principal + totalInterest;
-    const avgPayment = totalPayment / months;
+    const schedule = generateEPSchedule(principal, monthlyRate, months);
+    const summary = summarizeSchedule(schedule, principal);
+    const validation = validateSchedule(schedule, principal);
 
     return {
       type: REPAYMENT_TYPES.EQUAL_PRINCIPAL,
@@ -163,29 +320,49 @@ const LoanCalculator = (function() {
       principal: roundWon(principal),
       annualRate,
       months,
-      monthlyPayment: roundWon(firstPayment), // 초기 납부액 표시
-      firstPayment: roundWon(firstPayment),
-      lastPayment: roundWon(lastPayment),
-      avgPayment: roundWon(avgPayment),
-      maxPayment: roundWon(firstPayment),
-      totalInterest: roundWon(totalInterest),
-      totalPayment: roundWon(totalPayment),
+      graceMonths: 0,
+      monthlyPayment: summary.firstPayment,
+      firstPayment: summary.firstPayment,
+      lastPayment: summary.lastPayment,
+      avgPayment: summary.avgPayment,
+      maxPayment: summary.maxPayment,
+      totalInterest: summary.totalInterest,
+      totalPayment: summary.totalPayment,
+      validation,
     };
   }
 
   // === 만기일시상환 ===
 
+  function generateBulletSchedule(principal, monthlyRate, months) {
+    const schedule = [];
+    const monthlyInterest = roundWon(principal * monthlyRate);
+
+    for (let i = 1; i <= months; i++) {
+      const isLast = i === months;
+
+      schedule.push({
+        month: i,
+        payment: isLast ? principal + monthlyInterest : monthlyInterest,
+        principal: isLast ? principal : 0,
+        interest: monthlyInterest,
+        balance: isLast ? 0 : principal,
+        // 메타데이터
+        note: isLast ? '만기일시상환' : '이자만납부',
+      });
+    }
+
+    return schedule;
+  }
+
   /**
-   * 만기일시상환 계산
-   * 월 납부액 = P × r (이자만)
-   * 만기 시 = P + (P × r)
+   * 만기일시상환 계산 (SSOT 패턴)
    */
   function calculateBullet(principal, annualRate, months) {
     const monthlyRate = getMonthlyRate(annualRate);
-    const monthlyInterest = principal * monthlyRate;
-    const totalInterest = monthlyInterest * months;
-    const finalPayment = principal + monthlyInterest;
-    const totalPayment = monthlyInterest * (months - 1) + finalPayment;
+    const schedule = generateBulletSchedule(principal, monthlyRate, months);
+    const summary = summarizeSchedule(schedule, principal);
+    const validation = validateSchedule(schedule, principal);
 
     return {
       type: REPAYMENT_TYPES.BULLET,
@@ -193,36 +370,94 @@ const LoanCalculator = (function() {
       principal: roundWon(principal),
       annualRate,
       months,
-      monthlyPayment: roundWon(monthlyInterest), // 만기 전 월 납부액
-      firstPayment: roundWon(monthlyInterest),
-      lastPayment: roundWon(finalPayment),       // 만기 시 원금+이자
-      avgPayment: roundWon(totalPayment / months),
-      maxPayment: roundWon(finalPayment),
-      totalInterest: roundWon(totalInterest),
-      totalPayment: roundWon(totalPayment),
+      graceMonths: 0,
+      monthlyPayment: summary.firstPayment, // 만기 전 월 납부액 (이자만)
+      firstPayment: summary.firstPayment,
+      lastPayment: summary.lastPayment,     // 만기 시 원금+이자
+      avgPayment: summary.avgPayment,
+      maxPayment: summary.maxPayment,
+      totalInterest: summary.totalInterest,
+      totalPayment: summary.totalPayment,
+      validation,
+      // 만기일시 특화 정보
+      bulletWarning: `만기 시 원금 ${formatKRWReadable(principal)} 일시상환`,
     };
   }
 
   // === 거치식 상환 ===
 
-  /**
-   * 거치식 + 원리금균등상환 계산
-   */
-  function calculateGraceEqualPrincipalInterest(principal, annualRate, months, graceMonths) {
-    const monthlyRate = getMonthlyRate(annualRate);
+  function generateGraceSchedule(principal, monthlyRate, months, graceMonths, repaymentType) {
+    const schedule = [];
+    let balance = principal;
     const repaymentMonths = months - graceMonths;
 
     // 거치기간: 이자만 납부
-    const gracePayment = principal * monthlyRate;
-    const graceInterest = gracePayment * graceMonths;
+    const graceInterest = roundWon(principal * monthlyRate);
+    for (let i = 1; i <= graceMonths; i++) {
+      schedule.push({
+        month: i,
+        payment: graceInterest,
+        principal: 0,
+        interest: graceInterest,
+        balance: principal,
+        isGracePeriod: true,
+      });
+    }
 
-    // 상환기간: 원리금균등
-    const repaymentPayment = calcEqualPrincipalInterestPayment(principal, monthlyRate, repaymentMonths);
-    const repaymentTotal = repaymentPayment * repaymentMonths;
-    const repaymentInterest = repaymentTotal - principal;
+    // 상환기간
+    if (repaymentType === 'EPI') {
+      const rawPayment = calcEqualPrincipalInterestPayment(principal, monthlyRate, repaymentMonths);
+      for (let i = 1; i <= repaymentMonths; i++) {
+        const interest = balance * monthlyRate;
+        let principalPaid = rawPayment - interest;
+        if (i === repaymentMonths) principalPaid = balance;
+        const payment = principalPaid + interest;
+        balance = Math.max(0, balance - principalPaid);
 
-    const totalInterest = graceInterest + repaymentInterest;
-    const totalPayment = principal + totalInterest;
+        schedule.push({
+          month: graceMonths + i,
+          payment: roundWon(payment),
+          principal: roundWon(principalPaid),
+          interest: roundWon(interest),
+          balance: roundWon(balance),
+          isGracePeriod: false,
+        });
+      }
+    } else { // EP
+      const monthlyPrincipal = principal / repaymentMonths;
+      for (let i = 1; i <= repaymentMonths; i++) {
+        const interest = balance * monthlyRate;
+        const principalPaid = (i === repaymentMonths) ? balance : monthlyPrincipal;
+        const payment = principalPaid + interest;
+        balance = Math.max(0, balance - principalPaid);
+
+        schedule.push({
+          month: graceMonths + i,
+          payment: roundWon(payment),
+          principal: roundWon(principalPaid),
+          interest: roundWon(interest),
+          balance: roundWon(balance),
+          isGracePeriod: false,
+        });
+      }
+    }
+
+    return schedule;
+  }
+
+  /**
+   * 거치식 + 원리금균등상환 계산 (SSOT 패턴)
+   */
+  function calculateGraceEqualPrincipalInterest(principal, annualRate, months, graceMonths) {
+    const monthlyRate = getMonthlyRate(annualRate);
+    const schedule = generateGraceSchedule(principal, monthlyRate, months, graceMonths, 'EPI');
+    const summary = summarizeSchedule(schedule, principal);
+    const validation = validateSchedule(schedule, principal);
+
+    // 거치기간 납부액 (이자만)
+    const gracePayment = roundWon(principal * monthlyRate);
+    // 상환기간 첫 납부액
+    const repaymentFirstPayment = schedule.length > graceMonths ? schedule[graceMonths].payment : 0;
 
     return {
       type: REPAYMENT_TYPES.GRACE_EPI,
@@ -231,37 +466,30 @@ const LoanCalculator = (function() {
       annualRate,
       months,
       graceMonths,
-      repaymentMonths,
-      gracePayment: roundWon(gracePayment),
-      monthlyPayment: roundWon(repaymentPayment), // 상환기간 월 납부액
-      firstPayment: roundWon(gracePayment),       // 거치기간 첫 납부액
-      lastPayment: roundWon(repaymentPayment),
-      avgPayment: roundWon(totalPayment / months),
-      maxPayment: roundWon(repaymentPayment),
-      totalInterest: roundWon(totalInterest),
-      totalPayment: roundWon(totalPayment),
+      repaymentMonths: months - graceMonths,
+      gracePayment,
+      monthlyPayment: repaymentFirstPayment,
+      firstPayment: summary.firstPayment,
+      lastPayment: summary.lastPayment,
+      avgPayment: summary.avgPayment,
+      maxPayment: summary.maxPayment,
+      totalInterest: summary.totalInterest,
+      totalPayment: summary.totalPayment,
+      validation,
     };
   }
 
   /**
-   * 거치식 + 원금균등상환 계산
+   * 거치식 + 원금균등상환 계산 (SSOT 패턴)
    */
   function calculateGraceEqualPrincipal(principal, annualRate, months, graceMonths) {
     const monthlyRate = getMonthlyRate(annualRate);
-    const repaymentMonths = months - graceMonths;
+    const schedule = generateGraceSchedule(principal, monthlyRate, months, graceMonths, 'EP');
+    const summary = summarizeSchedule(schedule, principal);
+    const validation = validateSchedule(schedule, principal);
 
-    // 거치기간: 이자만 납부
-    const gracePayment = principal * monthlyRate;
-    const graceInterest = gracePayment * graceMonths;
-
-    // 상환기간: 원금균등
-    const monthlyPrincipal = principal / repaymentMonths;
-    const firstRepayment = monthlyPrincipal + (principal * monthlyRate);
-    const lastRepayment = monthlyPrincipal + (monthlyPrincipal * monthlyRate);
-    const repaymentInterest = principal * monthlyRate * (repaymentMonths + 1) / 2;
-
-    const totalInterest = graceInterest + repaymentInterest;
-    const totalPayment = principal + totalInterest;
+    const gracePayment = roundWon(principal * monthlyRate);
+    const repaymentFirstPayment = schedule.length > graceMonths ? schedule[graceMonths].payment : 0;
 
     return {
       type: REPAYMENT_TYPES.GRACE_EP,
@@ -270,28 +498,26 @@ const LoanCalculator = (function() {
       annualRate,
       months,
       graceMonths,
-      repaymentMonths,
-      gracePayment: roundWon(gracePayment),
-      monthlyPayment: roundWon(firstRepayment), // 상환기간 첫 납부액
-      firstPayment: roundWon(gracePayment),     // 거치기간 첫 납부액
-      lastPayment: roundWon(lastRepayment),
-      avgPayment: roundWon(totalPayment / months),
-      maxPayment: roundWon(firstRepayment),
-      totalInterest: roundWon(totalInterest),
-      totalPayment: roundWon(totalPayment),
+      repaymentMonths: months - graceMonths,
+      gracePayment,
+      monthlyPayment: repaymentFirstPayment,
+      firstPayment: summary.firstPayment,
+      lastPayment: summary.lastPayment,
+      avgPayment: summary.avgPayment,
+      maxPayment: summary.maxPayment,
+      totalInterest: summary.totalInterest,
+      totalPayment: summary.totalPayment,
+      validation,
     };
   }
 
-  // === 상환 스케줄 생성 ===
+  // === 통합 스케줄 생성 ===
 
   /**
    * 상환 스케줄 생성 (모든 방식 지원)
-   * @returns {Array} [{ month, payment, principal, interest, balance }]
    */
   function generateSchedule(type, principal, annualRate, months, graceMonths = 0) {
     const monthlyRate = getMonthlyRate(annualRate);
-    const schedule = [];
-    let balance = principal;
 
     switch (type) {
       case REPAYMENT_TYPES.EQUAL_PRINCIPAL_INTEREST:
@@ -310,150 +536,35 @@ const LoanCalculator = (function() {
         return generateGraceSchedule(principal, monthlyRate, months, graceMonths, 'EP');
 
       default:
-        return [];
+        return generateEPISchedule(principal, monthlyRate, months);
     }
-  }
-
-  function generateEPISchedule(principal, monthlyRate, months) {
-    const schedule = [];
-    let balance = principal;
-    const payment = calcEqualPrincipalInterestPayment(principal, monthlyRate, months);
-
-    for (let i = 1; i <= months; i++) {
-      const interest = balance * monthlyRate;
-      let principalPaid = payment - interest;
-
-      // 마지막 회차 조정
-      if (i === months) {
-        principalPaid = balance;
-      }
-
-      balance = Math.max(0, balance - principalPaid);
-
-      schedule.push({
-        month: i,
-        payment: roundWon(i === months ? principalPaid + interest : payment),
-        principal: roundWon(principalPaid),
-        interest: roundWon(interest),
-        balance: roundWon(balance),
-      });
-    }
-
-    return schedule;
-  }
-
-  function generateEPSchedule(principal, monthlyRate, months) {
-    const schedule = [];
-    let balance = principal;
-    const monthlyPrincipal = principal / months;
-
-    for (let i = 1; i <= months; i++) {
-      const interest = balance * monthlyRate;
-      const principalPaid = i === months ? balance : monthlyPrincipal;
-      const payment = principalPaid + interest;
-
-      balance = Math.max(0, balance - principalPaid);
-
-      schedule.push({
-        month: i,
-        payment: roundWon(payment),
-        principal: roundWon(principalPaid),
-        interest: roundWon(interest),
-        balance: roundWon(balance),
-      });
-    }
-
-    return schedule;
-  }
-
-  function generateBulletSchedule(principal, monthlyRate, months) {
-    const schedule = [];
-    const monthlyInterest = principal * monthlyRate;
-
-    for (let i = 1; i <= months; i++) {
-      const isLast = i === months;
-      schedule.push({
-        month: i,
-        payment: roundWon(isLast ? principal + monthlyInterest : monthlyInterest),
-        principal: roundWon(isLast ? principal : 0),
-        interest: roundWon(monthlyInterest),
-        balance: roundWon(isLast ? 0 : principal),
-      });
-    }
-
-    return schedule;
-  }
-
-  function generateGraceSchedule(principal, monthlyRate, months, graceMonths, repaymentType) {
-    const schedule = [];
-    let balance = principal;
-    const repaymentMonths = months - graceMonths;
-
-    // 거치기간
-    const graceInterest = principal * monthlyRate;
-    for (let i = 1; i <= graceMonths; i++) {
-      schedule.push({
-        month: i,
-        payment: roundWon(graceInterest),
-        principal: 0,
-        interest: roundWon(graceInterest),
-        balance: roundWon(principal),
-        isGracePeriod: true,
-      });
-    }
-
-    // 상환기간
-    if (repaymentType === 'EPI') {
-      const payment = calcEqualPrincipalInterestPayment(principal, monthlyRate, repaymentMonths);
-      for (let i = 1; i <= repaymentMonths; i++) {
-        const interest = balance * monthlyRate;
-        let principalPaid = payment - interest;
-        if (i === repaymentMonths) principalPaid = balance;
-        balance = Math.max(0, balance - principalPaid);
-
-        schedule.push({
-          month: graceMonths + i,
-          payment: roundWon(i === repaymentMonths ? principalPaid + interest : payment),
-          principal: roundWon(principalPaid),
-          interest: roundWon(interest),
-          balance: roundWon(balance),
-          isGracePeriod: false,
-        });
-      }
-    } else {
-      const monthlyPrincipal = principal / repaymentMonths;
-      for (let i = 1; i <= repaymentMonths; i++) {
-        const interest = balance * monthlyRate;
-        const principalPaid = i === repaymentMonths ? balance : monthlyPrincipal;
-        const payment = principalPaid + interest;
-        balance = Math.max(0, balance - principalPaid);
-
-        schedule.push({
-          month: graceMonths + i,
-          payment: roundWon(payment),
-          principal: roundWon(principalPaid),
-          interest: roundWon(interest),
-          balance: roundWon(balance),
-          isGracePeriod: false,
-        });
-      }
-    }
-
-    return schedule;
   }
 
   // === CSV 변환 ===
 
-  function scheduleToCSV(schedule, loanName = '대출') {
-    const headers = ['회차', '납부액', '원금', '이자', '잔액', '비고'];
+  function scheduleToCSV(schedule, loanInfo = {}) {
+    const headers = ['회차', '납부액(원금+이자)', '원금상환', '이자', '상환후잔액', '비고'];
     const rows = schedule.map(row => [
       row.month,
       row.payment,
       row.principal,
       row.interest,
       row.balance,
-      row.isGracePeriod ? '거치기간' : ''
+      row.isGracePeriod ? '거치기간' : (row.note || '')
     ]);
+
+    // 합계 행 추가
+    if (loanInfo.principal) {
+      const summary = summarizeSchedule(schedule, loanInfo.principal);
+      rows.push([
+        '합계',
+        summary.totalPayment,
+        summary.totalPrincipalPaid,
+        summary.totalInterest,
+        0,
+        ''
+      ]);
+    }
 
     const csv = [headers, ...rows]
       .map(row => row.join(','))
@@ -517,8 +628,10 @@ const LoanCalculator = (function() {
 
     // 검증
     validate: validateInputs,
+    validateSchedule,
+    summarizeSchedule,
 
-    // 계산
+    // 통합 계산 함수
     calculate(type, principal, annualRate, months, graceMonths = 0) {
       switch (type) {
         case REPAYMENT_TYPES.EQUAL_PRINCIPAL_INTEREST:
@@ -557,7 +670,7 @@ const LoanCalculator = (function() {
   };
 })();
 
-// ES Module export (Phase 2 테스트용)
+// ES Module export (테스트용)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = LoanCalculator;
 }
