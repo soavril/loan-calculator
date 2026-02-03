@@ -26,68 +26,90 @@
     ALL: Infinity,
   };
 
+  // === 안전한 DOM 선택 헬퍼 ===
+  function $(id) {
+    return document.getElementById(id);
+  }
+  function $$(selector) {
+    return document.querySelectorAll(selector);
+  }
+
   // === DOM 요소 ===
   const DOM = {
     // 탭
-    tabs: document.querySelectorAll('.tab-btn'),
-    loanACard: document.getElementById('loan-a-card'),
-    loanBCard: document.getElementById('loan-b-card'),
+    tabs: $$('.tab-btn'),
+    loanACard: $('loan-a-card'),
+    loanBCard: $('loan-b-card'),
 
     // 요약
-    summaryCard: document.getElementById('summary-card'),
-    heroDiff: document.getElementById('hero-diff'),
-    heroContext: document.getElementById('hero-context'),
+    summaryCard: $('summary-card'),
+    heroDiff: $('hero-diff'),
+    heroContext: $('hero-context'),
 
     // 대출 A 입력
-    principalA: document.getElementById('principal-a'),
-    termYearsA: document.getElementById('term-years-a'),
-    termMonthsA: document.getElementById('term-months-a'),
-    rateA: document.getElementById('rate-a'),
-    repaymentA: document.querySelectorAll('input[name="repayment-a"]'),
-    graceA: document.getElementById('grace-a'),
-    graceRepaymentA: document.querySelectorAll('input[name="grace-repayment-a"]'),
-    graceRepaymentAGroup: document.getElementById('grace-repayment-a-group'),
+    principalA: $('principal-a'),
+    termYearsA: $('term-years-a'),
+    termMonthsA: $('term-months-a'),
+    rateA: $('rate-a'),
+    repaymentA: $$('input[name="repayment-a"]'),
+    graceA: $('grace-a'),
+    graceRepaymentA: $$('input[name="grace-repayment-a"]'),
+    graceRepaymentAGroup: $('grace-repayment-a-group'),
 
     // 대출 B 입력
-    principalB: document.getElementById('principal-b'),
-    termYearsB: document.getElementById('term-years-b'),
-    termMonthsB: document.getElementById('term-months-b'),
-    rateB: document.getElementById('rate-b'),
-    repaymentB: document.querySelectorAll('input[name="repayment-b"]'),
-    graceB: document.getElementById('grace-b'),
-    graceRepaymentB: document.querySelectorAll('input[name="grace-repayment-b"]'),
-    graceRepaymentBGroup: document.getElementById('grace-repayment-b-group'),
+    principalB: $('principal-b'),
+    termYearsB: $('term-years-b'),
+    termMonthsB: $('term-months-b'),
+    rateB: $('rate-b'),
+    repaymentB: $$('input[name="repayment-b"]'),
+    graceB: $('grace-b'),
+    graceRepaymentB: $$('input[name="grace-repayment-b"]'),
+    graceRepaymentBGroup: $('grace-repayment-b-group'),
 
     // 결과
-    resultTypeA: document.getElementById('result-type-a'),
-    resultTypeB: document.getElementById('result-type-b'),
-    resultMonthlyA: document.getElementById('result-monthly-a'),
-    resultMonthlyB: document.getElementById('result-monthly-b'),
-    rowFinalPayment: document.getElementById('row-final-payment'),
-    resultFinalA: document.getElementById('result-final-a'),
-    resultFinalB: document.getElementById('result-final-b'),
-    diffFinal: document.getElementById('diff-final'),
-    resultInterestA: document.getElementById('result-interest-a'),
-    resultInterestB: document.getElementById('result-interest-b'),
-    resultTotalA: document.getElementById('result-total-a'),
-    resultTotalB: document.getElementById('result-total-b'),
-    diffMonthly: document.getElementById('diff-monthly'),
-    diffInterest: document.getElementById('diff-interest'),
-    diffTotal: document.getElementById('diff-total'),
+    resultTypeA: $('result-type-a'),
+    resultTypeB: $('result-type-b'),
+    resultMonthlyA: $('result-monthly-a'),
+    resultMonthlyB: $('result-monthly-b'),
+    rowFinalPayment: $('row-final-payment'),
+    resultFinalA: $('result-final-a'),
+    resultFinalB: $('result-final-b'),
+    diffFinal: $('diff-final'),
+    resultInterestA: $('result-interest-a'),
+    resultInterestB: $('result-interest-b'),
+    resultTotalA: $('result-total-a'),
+    resultTotalB: $('result-total-b'),
+    diffMonthly: $('diff-monthly'),
+    diffInterest: $('diff-interest'),
+    diffTotal: $('diff-total'),
 
     // 상환표
-    btnScheduleA: document.getElementById('btn-schedule-a'),
-    btnScheduleB: document.getElementById('btn-schedule-b'),
-    scheduleSection: document.getElementById('schedule-section'),
-    scheduleTitle: document.getElementById('schedule-title'),
-    scheduleTbody: document.getElementById('schedule-tbody'),
-    btnDownloadCSV: document.getElementById('btn-download-csv'),
-    btnCloseSchedule: document.getElementById('btn-close-schedule'),
+    btnScheduleA: $('btn-schedule-a'),
+    btnScheduleB: $('btn-schedule-b'),
+    scheduleSection: $('schedule-section'),
+    scheduleTitle: $('schedule-title'),
+    scheduleTbody: $('schedule-tbody'),
+    btnDownloadCSV: $('btn-download-csv'),
+    btnCloseSchedule: $('btn-close-schedule'),
 
-    // 힌트
-    principalAHint: document.getElementById('principal-a-hint'),
-    principalBHint: document.getElementById('principal-b-hint'),
+    // 힌트 및 에러
+    principalAHint: $('principal-a-hint'),
+    principalBHint: $('principal-b-hint'),
   };
+
+  // === 안전한 DOM 업데이트 헬퍼 ===
+  function safeText(el, text) {
+    if (el) el.textContent = text;
+  }
+  function safeHTML(el, html) {
+    if (el) el.innerHTML = html;
+  }
+  function safeStyle(el, prop, value) {
+    if (el) el.style[prop] = value;
+  }
+  function safeClass(el, action, className) {
+    if (el) el.classList[action](className);
+  }
 
   // === 상태 ===
   let currentSchedule = null;
@@ -220,100 +242,202 @@
     return { principal, months, rate, grace, type: finalType, rawType: repaymentType };
   }
 
+  // === 입력 유효성 검사 ===
+
+  function validateInput(input, side) {
+    const errors = [];
+    const isA = side === 'A';
+    const cardId = isA ? 'loan-a-card' : 'loan-b-card';
+
+    // 기존 에러 표시 제거
+    clearInputErrors(cardId);
+
+    // 원금 검증
+    if (input.principal < 100000) {
+      errors.push({ field: isA ? 'principal-a' : 'principal-b', message: '최소 10만원 이상' });
+    }
+    if (input.principal > 10000000000) {
+      errors.push({ field: isA ? 'principal-a' : 'principal-b', message: '최대 100억원 이하' });
+    }
+
+    // 기간 검증
+    if (input.months < 1 || input.months > 600) {
+      errors.push({ field: isA ? 'term-months-a' : 'term-months-b', message: '1~600개월' });
+    }
+
+    // 이자율 검증
+    if (input.rate < 0 || input.rate > 30) {
+      errors.push({ field: isA ? 'rate-a' : 'rate-b', message: '0~30%' });
+    }
+
+    // 거치기간 검증
+    if (input.grace >= input.months) {
+      errors.push({ field: isA ? 'grace-a' : 'grace-b', message: '대출기간보다 짧아야 함' });
+    }
+
+    // 에러 표시
+    errors.forEach(err => showInputError(err.field, err.message));
+
+    return errors.length === 0;
+  }
+
+  function showInputError(fieldId, message) {
+    const field = $(fieldId);
+    if (!field) return;
+
+    const wrapper = field.closest('.input-wrapper');
+    if (wrapper) {
+      wrapper.classList.add('input-error');
+    }
+
+    // 에러 메시지 추가
+    const group = field.closest('.input-group');
+    if (group && !group.querySelector('.error-message')) {
+      const errorEl = document.createElement('p');
+      errorEl.className = 'error-message';
+      errorEl.textContent = message;
+      group.appendChild(errorEl);
+    }
+  }
+
+  function clearInputErrors(cardId) {
+    const card = $(cardId);
+    if (!card) return;
+
+    card.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+    card.querySelectorAll('.error-message').forEach(el => el.remove());
+  }
+
   // === 계산 및 결과 업데이트 ===
 
   function calculate() {
-    const inputA = getLoanInputs('A');
-    const inputB = getLoanInputs('B');
+    try {
+      const inputA = getLoanInputs('A');
+      const inputB = getLoanInputs('B');
 
-    const resultA = LoanCalculator.calculate(
-      inputA.type,
-      inputA.principal,
-      inputA.rate,
-      inputA.months,
-      inputA.grace
-    );
+      // 입력 유효성 검사
+      const validA = validateInput(inputA, 'A');
+      const validB = validateInput(inputB, 'B');
 
-    const resultB = LoanCalculator.calculate(
-      inputB.type,
-      inputB.principal,
-      inputB.rate,
-      inputB.months,
-      inputB.grace
-    );
+      if (!validA || !validB) {
+        return; // 유효하지 않으면 계산 중단
+      }
 
-    lastResultA = resultA;
-    lastResultB = resultB;
+      const resultA = LoanCalculator.calculate(
+        inputA.type,
+        inputA.principal,
+        inputA.rate,
+        inputA.months,
+        inputA.grace
+      );
 
-    updateResults(resultA, resultB);
-    updateHeroSummary(resultA, resultB);
-    updateWarningBanners(inputA, inputB, resultA, resultB);
-    updateValidationBadge(resultA, resultB);
+      const resultB = LoanCalculator.calculate(
+        inputB.type,
+        inputB.principal,
+        inputB.rate,
+        inputB.months,
+        inputB.grace
+      );
+
+      lastResultA = resultA;
+      lastResultB = resultB;
+
+      updateResults(resultA, resultB);
+      updateHeroSummary(resultA, resultB);
+      updateWarningBanners(inputA, inputB, resultA, resultB);
+      updateValidationBadge(resultA, resultB);
+
+    } catch (error) {
+      console.error('계산 오류:', error);
+      showCalculationError();
+    }
+  }
+
+  function showCalculationError() {
+    safeText(DOM.heroDiff, '계산 오류');
+    safeText(DOM.heroContext, '입력값을 확인해주세요');
+    safeClass(DOM.summaryCard, 'remove', 'a-higher');
+    safeClass(DOM.summaryCard, 'remove', 'b-higher');
+    safeClass(DOM.summaryCard, 'add', 'equal');
   }
 
   const debouncedCalculate = debounce(calculate, 100);
 
   function updateResults(resultA, resultB) {
     // 상환방식
-    DOM.resultTypeA.textContent = resultA.typeName;
-    DOM.resultTypeB.textContent = resultB.typeName;
+    safeText(DOM.resultTypeA, resultA.typeName);
+    safeText(DOM.resultTypeB, resultB.typeName);
 
     // 월 납부액 (만기일시의 경우 특별 표기)
     const isBulletA = resultA.type === 'bullet';
     const isBulletB = resultB.type === 'bullet';
 
     if (isBulletA) {
-      DOM.resultMonthlyA.innerHTML = LoanCalculator.formatKRW(resultA.monthlyPayment) +
-        '<span class="sub-value">(이자만)</span>';
+      safeHTML(DOM.resultMonthlyA, LoanCalculator.formatKRW(resultA.monthlyPayment) +
+        '<span class="sub-value">(이자만)</span>');
     } else {
-      DOM.resultMonthlyA.textContent = LoanCalculator.formatKRW(resultA.monthlyPayment);
+      safeText(DOM.resultMonthlyA, LoanCalculator.formatKRW(resultA.monthlyPayment));
     }
+    highlightChange(DOM.resultMonthlyA);
 
     if (isBulletB) {
-      DOM.resultMonthlyB.innerHTML = LoanCalculator.formatKRW(resultB.monthlyPayment) +
-        '<span class="sub-value">(이자만)</span>';
+      safeHTML(DOM.resultMonthlyB, LoanCalculator.formatKRW(resultB.monthlyPayment) +
+        '<span class="sub-value">(이자만)</span>');
     } else {
-      DOM.resultMonthlyB.textContent = LoanCalculator.formatKRW(resultB.monthlyPayment);
+      safeText(DOM.resultMonthlyB, LoanCalculator.formatKRW(resultB.monthlyPayment));
     }
+    highlightChange(DOM.resultMonthlyB);
 
     updateDiffCell(DOM.diffMonthly, resultA.monthlyPayment, resultB.monthlyPayment);
 
     // 만기 납부액 (만기일시상환이 있는 경우에만 표시)
     if (isBulletA || isBulletB) {
-      DOM.rowFinalPayment.style.display = '';
+      safeStyle(DOM.rowFinalPayment, 'display', '');
 
-      // 만기일시: 원금 + 마지막 이자 / 기타: 마지막 납부액
-      const finalA = isBulletA ? resultA.lastPayment : resultA.lastPayment;
-      const finalB = isBulletB ? resultB.lastPayment : resultB.lastPayment;
+      const finalA = resultA.lastPayment;
+      const finalB = resultB.lastPayment;
 
       if (isBulletA) {
-        DOM.resultFinalA.innerHTML = '<strong class="bullet-amount">' +
-          LoanCalculator.formatKRW(finalA) + '</strong>';
+        safeHTML(DOM.resultFinalA, '<strong class="bullet-amount">' +
+          LoanCalculator.formatKRW(finalA) + '</strong>');
       } else {
-        DOM.resultFinalA.textContent = LoanCalculator.formatKRW(finalA);
+        safeText(DOM.resultFinalA, LoanCalculator.formatKRW(finalA));
       }
 
       if (isBulletB) {
-        DOM.resultFinalB.innerHTML = '<strong class="bullet-amount">' +
-          LoanCalculator.formatKRW(finalB) + '</strong>';
+        safeHTML(DOM.resultFinalB, '<strong class="bullet-amount">' +
+          LoanCalculator.formatKRW(finalB) + '</strong>');
       } else {
-        DOM.resultFinalB.textContent = LoanCalculator.formatKRW(finalB);
+        safeText(DOM.resultFinalB, LoanCalculator.formatKRW(finalB));
       }
 
       updateDiffCell(DOM.diffFinal, finalA, finalB);
     } else {
-      DOM.rowFinalPayment.style.display = 'none';
+      safeStyle(DOM.rowFinalPayment, 'display', 'none');
     }
 
     // 총 이자
-    DOM.resultInterestA.textContent = LoanCalculator.formatKRW(resultA.totalInterest);
-    DOM.resultInterestB.textContent = LoanCalculator.formatKRW(resultB.totalInterest);
+    safeText(DOM.resultInterestA, LoanCalculator.formatKRW(resultA.totalInterest));
+    safeText(DOM.resultInterestB, LoanCalculator.formatKRW(resultB.totalInterest));
+    highlightChange(DOM.resultInterestA);
+    highlightChange(DOM.resultInterestB);
     updateDiffCell(DOM.diffInterest, resultA.totalInterest, resultB.totalInterest);
 
     // 총 상환액
-    DOM.resultTotalA.textContent = LoanCalculator.formatKRW(resultA.totalPayment);
-    DOM.resultTotalB.textContent = LoanCalculator.formatKRW(resultB.totalPayment);
+    safeText(DOM.resultTotalA, LoanCalculator.formatKRW(resultA.totalPayment));
+    safeText(DOM.resultTotalB, LoanCalculator.formatKRW(resultB.totalPayment));
+    highlightChange(DOM.resultTotalA);
+    highlightChange(DOM.resultTotalB);
     updateDiffCell(DOM.diffTotal, resultA.totalPayment, resultB.totalPayment);
+  }
+
+  // 값 변경 시 하이라이트 효과
+  function highlightChange(el) {
+    if (!el) return;
+    el.classList.remove('value-changed');
+    // 리플로우 강제
+    void el.offsetWidth;
+    el.classList.add('value-changed');
   }
 
   function updateDiffCell(cell, valueA, valueB) {
@@ -337,20 +461,23 @@
     const diff = resultA.totalInterest - resultB.totalInterest;
     const absDiff = Math.abs(diff);
 
-    DOM.heroDiff.textContent = LoanCalculator.formatKRWReadable(absDiff);
+    safeText(DOM.heroDiff, LoanCalculator.formatKRWReadable(absDiff));
+    highlightChange(DOM.heroDiff);
 
-    DOM.summaryCard.classList.remove('a-higher', 'b-higher', 'equal');
+    safeClass(DOM.summaryCard, 'remove', 'a-higher');
+    safeClass(DOM.summaryCard, 'remove', 'b-higher');
+    safeClass(DOM.summaryCard, 'remove', 'equal');
 
     if (diff > 100) {
-      DOM.heroContext.textContent = '대출 A가 더 많은 이자를 납부합니다';
-      DOM.summaryCard.classList.add('a-higher');
+      safeText(DOM.heroContext, '대출 A가 더 많은 이자를 납부합니다');
+      safeClass(DOM.summaryCard, 'add', 'a-higher');
     } else if (diff < -100) {
-      DOM.heroContext.textContent = '대출 B가 더 많은 이자를 납부합니다';
-      DOM.summaryCard.classList.add('b-higher');
+      safeText(DOM.heroContext, '대출 B가 더 많은 이자를 납부합니다');
+      safeClass(DOM.summaryCard, 'add', 'b-higher');
     } else {
-      DOM.heroDiff.textContent = '0원';
-      DOM.heroContext.textContent = '두 대출의 총 이자가 동일합니다';
-      DOM.summaryCard.classList.add('equal');
+      safeText(DOM.heroDiff, '0원');
+      safeText(DOM.heroContext, '두 대출의 총 이자가 동일합니다');
+      safeClass(DOM.summaryCard, 'add', 'equal');
     }
   }
 
