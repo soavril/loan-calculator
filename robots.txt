@@ -4,5 +4,5 @@
 User-agent: *
 Allow: /
 
-# Sitemap (update with actual domain)
-Sitemap: https://yourdomain.com/sitemap.xml
+# Sitemap
+Sitemap: https://www.loancalcx.com/sitemap.xml
