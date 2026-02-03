@@ -63,6 +63,10 @@
     resultTypeB: document.getElementById('result-type-b'),
     resultMonthlyA: document.getElementById('result-monthly-a'),
     resultMonthlyB: document.getElementById('result-monthly-b'),
+    rowFinalPayment: document.getElementById('row-final-payment'),
+    resultFinalA: document.getElementById('result-final-a'),
+    resultFinalB: document.getElementById('result-final-b'),
+    diffFinal: document.getElementById('diff-final'),
     resultInterestA: document.getElementById('result-interest-a'),
     resultInterestB: document.getElementById('result-interest-b'),
     resultTotalA: document.getElementById('result-total-a'),
@@ -255,14 +259,17 @@
     DOM.resultTypeB.textContent = resultB.typeName;
 
     // 월 납부액 (만기일시의 경우 특별 표기)
-    if (resultA.type === 'bullet') {
+    const isBulletA = resultA.type === 'bullet';
+    const isBulletB = resultB.type === 'bullet';
+
+    if (isBulletA) {
       DOM.resultMonthlyA.innerHTML = LoanCalculator.formatKRW(resultA.monthlyPayment) +
         '<span class="sub-value">(이자만)</span>';
     } else {
       DOM.resultMonthlyA.textContent = LoanCalculator.formatKRW(resultA.monthlyPayment);
     }
 
-    if (resultB.type === 'bullet') {
+    if (isBulletB) {
       DOM.resultMonthlyB.innerHTML = LoanCalculator.formatKRW(resultB.monthlyPayment) +
         '<span class="sub-value">(이자만)</span>';
     } else {
@@ -270,6 +277,33 @@
     }
 
     updateDiffCell(DOM.diffMonthly, resultA.monthlyPayment, resultB.monthlyPayment);
+
+    // 만기 납부액 (만기일시상환이 있는 경우에만 표시)
+    if (isBulletA || isBulletB) {
+      DOM.rowFinalPayment.style.display = '';
+
+      // 만기일시: 원금 + 마지막 이자 / 기타: 마지막 납부액
+      const finalA = isBulletA ? resultA.lastPayment : resultA.lastPayment;
+      const finalB = isBulletB ? resultB.lastPayment : resultB.lastPayment;
+
+      if (isBulletA) {
+        DOM.resultFinalA.innerHTML = '<strong class="bullet-amount">' +
+          LoanCalculator.formatKRW(finalA) + '</strong>';
+      } else {
+        DOM.resultFinalA.textContent = LoanCalculator.formatKRW(finalA);
+      }
+
+      if (isBulletB) {
+        DOM.resultFinalB.innerHTML = '<strong class="bullet-amount">' +
+          LoanCalculator.formatKRW(finalB) + '</strong>';
+      } else {
+        DOM.resultFinalB.textContent = LoanCalculator.formatKRW(finalB);
+      }
+
+      updateDiffCell(DOM.diffFinal, finalA, finalB);
+    } else {
+      DOM.rowFinalPayment.style.display = 'none';
+    }
 
     // 총 이자
     DOM.resultInterestA.textContent = LoanCalculator.formatKRW(resultA.totalInterest);

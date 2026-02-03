@@ -908,6 +908,25 @@ input:focus-visible {
   margin-top: 0.125rem;
 }
 
+/* === 만기일시 강조 === */
+.bullet-label {
+  color: #e65100;
+}
+
+.bullet-highlight {
+  background: #fff3e0;
+}
+
+.bullet-amount {
+  color: #d84315;
+  font-size: 1rem;
+}
+
+#row-final-payment {
+  background: #fffde7;
+  border-left: 3px solid #ff9800;
+}
+
 /* === 유틸리티 === */
 .sr-only {
   position: absolute;
