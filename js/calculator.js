@@ -126,15 +126,23 @@ const LoanCalculator = (function() {
       if (row.payment > maxPayment) maxPayment = row.payment;
     });
 
+    // 반올림 후 값
+    const roundedTotalPayment = roundWon(totalPayment);
+
+    // 총 이자는 (총 상환액 - 원금)으로 계산하여 일관성 보장
+    // 이렇게 하면 "총 상환액 = 원금 + 총 이자"가 항상 정확히 성립
+    const derivedTotalInterest = roundedTotalPayment - originalPrincipal;
+
     return {
       firstPayment: roundWon(schedule[0].payment),
       lastPayment: roundWon(schedule[schedule.length - 1].payment),
       maxPayment: roundWon(maxPayment),
       avgPayment: roundWon(totalPayment / schedule.length),
-      totalInterest: roundWon(totalInterest),
-      totalPayment: roundWon(totalPayment),
-      // 검증용
+      totalInterest: derivedTotalInterest,  // 원금 기준으로 역산
+      totalPayment: roundedTotalPayment,
+      // 검증용 (실제 합계)
       totalPrincipalPaid: roundWon(totalPrincipal),
+      rawInterestSum: roundWon(totalInterest),  // 행 합계 (참고용)
       finalBalance: roundWon(schedule[schedule.length - 1].balance),
     };
   }
